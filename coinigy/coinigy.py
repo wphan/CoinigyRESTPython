@@ -1,3 +1,5 @@
+import time
+import timeit
 from collections import namedtuple
 import numpy as np
 import pandas as pd
@@ -8,6 +10,7 @@ logger = logging.getLogger(__name__)
 credentials = namedtuple('credentials', ('api', 'secret', 'endpoint'))
 connection = namedtuple('connection', ('hostname', 'port', 'secure'))
 alerts = namedtuple('alerts', ('open_alerts', 'alert_history'))
+API_CALL_DELAY = 0.5 # seconds
 
 
 class CoinigyREST:
@@ -18,6 +21,7 @@ class CoinigyREST:
         self.api = acct.api
         self.secret = acct.secret
         self.endpoint = acct.endpoint
+        self.last_api_call = 0
 
     def request(self, method, query=None, json=False, **args):
         """
@@ -34,7 +38,13 @@ class CoinigyREST:
         if query is not None:
             payload.update(query)
 
+        # ensure we dont make API calls faster than API_CALL_DELAY
+        time_to_sleep = API_CALL_DELAY - (timeit.default_timer() - self.last_api_call)
+        if time_to_sleep > 0:
+            time.sleep(time_to_sleep)
         r = requests.post(url, data=payload)
+        self.last_api_call = timeit.default_timer()
+
         if 'err_msg' in r.json().keys():
             logger.error("Error message: {}".format(r.json()['err_msg']))
             logger.error("Error number: {}".format(r.json()['err_num']))
