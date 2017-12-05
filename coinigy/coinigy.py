@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 credentials = namedtuple('credentials', ('api', 'secret', 'endpoint'))
 connection = namedtuple('connection', ('hostname', 'port', 'secure'))
 alerts = namedtuple('alerts', ('open_alerts', 'alert_history'))
-API_CALL_DELAY = 0.5 # seconds
+API_CALL_DELAY = 0.2 # seconds
 
 
 class CoinigyREST:
@@ -95,8 +95,8 @@ class CoinigyREST:
     def activity(self):
         return self.request('activity')
 
-    def balances(self):
-        return self.request('balances')
+    def balances(self, auth_id):
+        return self.request('balances', auth_ids=auth_id)
 
     def push_notifications(self):
         return self.request('pushNotifications')
