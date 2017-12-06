@@ -29,7 +29,7 @@ def find_arbitrage(coinigy):
 
     # find key pairs that are shared between exchanges
     for idx, exchange in enumerate(exch_markets[:-1]):
-        for idx_next in range(idx + 1, len(exch_markets)):
+        for idx_next in list(range(idx + 1, len(exch_markets))):
             # all matches between exch[i] and exch[i+1], returned pd.Series is lenght of exch[i]
             for idx_match, match in ((exchange.mkt_name).isin(exch_markets[idx_next].mkt_name)).iteritems():
                 if match:
